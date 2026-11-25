@@ -1,0 +1,1 @@
+ecte477_cr_final FINAL v8 (2026-11-19): aligns to the REQUESTED colour, ignores navy wall/MDF/floor (white-paper check), reverses when cut off

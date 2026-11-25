@@ -1,0 +1,22 @@
+# Zone goal poses in the map frame (recorded with record_zone / tf map->base_link)
+# start = the taped spot where mapping began (map origin). Menu option "s" puts AMCL there.
+start: {x: 0.0, y: 0.0, yaw_deg: 0.0}
+zones:
+  electrical:
+    label: "Electrical Zone"
+    colour: blue
+    x: 0.443
+    y: 0.065
+    yaw_deg: 179.5
+  mechanical:
+    label: "Mechanical Zone"
+    colour: pink
+    x: 0.084
+    y: 0.806
+    yaw_deg: 112.1
+  material_storage:
+    label: "Material Storage Zone"
+    colour: yellow
+    x: 1.618
+    y: 0.775
+    yaw_deg: 97.2

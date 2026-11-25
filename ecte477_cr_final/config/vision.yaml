@@ -1,0 +1,45 @@
+# Vision settings shared by sheet_detector, zone_verifier and the offline tools.
+# HSV ranges use OpenCV units: H 0-179, S 0-255, V 0-255.
+# Each colour is a LIST of ranges [H_low, S_low, V_low, H_high, S_high, V_high].
+# Measured on the lab markers: pink H~163-168, blue H~107-115, yellow H~27,
+# brown MDF wall H~12-16 (moderate S) -> red kept to H<=7 / H>=173 with high S.
+# Retune with:  ros2 run construction_robot hsv_tuner <snapshot.png> --colour red
+hsv_ranges:
+  red:    [[0, 100, 50, 8, 255, 255], [171, 100, 50, 179, 255, 255]]
+  green:  [[35, 60, 30, 95, 255, 255]]   # dark / blue-ish green sheets too (blue markers start at 95+)
+  blue:   [[95, 90, 40, 130, 255, 255]]    # S>=90 + white-paper check: rejects the navy lab wall (S~65-90)
+  pink:   [[145, 80, 60, 172, 255, 255]]
+  yellow: [[20, 110, 80, 40, 255, 255]]   # S>=110: excludes the brown MDF (H~26, S<=92)
+
+zone_colours: [blue, pink, yellow]
+
+sheet:                 # red/green A4 sheet detector
+  process_hz: 4.0      # frames analysed per second (camera sends ~30)
+  resize_width: 160    # analyse a 160 px wide copy (1/4 of the 320x240 pixels)
+  min_area_frac: 0.03  # sheet must cover >= 3 % of the view (A4 up to ~1.4 m away)
+  min_solidity: 0.75   # blob must be solid (a hand over a corner is still OK)
+  debounce_n: 4        # look at the last 4 processed frames ...
+  debounce_k: 3        # ... and change state when 3 of them agree
+
+zone:                  # zone verification after arrival
+  resize_width: 320
+  frames: 7            # fresh frames combined by majority vote
+  frame_spacing_s: 0.2
+  timeout_s: 8.0
+  min_zone_frac: 0.01  # zone colour must cover >= 1 % of the view
+  min_shape_area_px: 150
+  cnn_model: object_cnn.onnx
+  cnn_input: 40
+  cnn_min_score: 0.7
+
+align:                 # rotate-first visual alignment after Nav2 arrives
+  enabled: true
+  timeout_s: 8.0           # give up after 8 s (then verify anyway)
+  centre_tolerance: 0.12   # marker centre within 12 % of half the image width = centred
+  min_turn_rad_s: 0.25     # every turn command is at least this fast (really moves the robot)
+  max_turn_rad_s: 0.6
+  k_turn: 0.8
+  search_deg: 70.0         # marker not visible -> sweep up to 70 deg left and right
+  backup_speed_m_s: 0.06   # marker cut off by the image edge -> reverse ...
+  max_backup_m: 0.15       # ... at most 15 cm ...
+  rear_clear_m: 0.45       # ... and only if the LiDAR sees >= 45 cm free behind
